@@ -18,7 +18,7 @@ const monitorMetabigorCompanyScanStatus = async (
     console.log('[METABIGOR-COMPANY] Monitoring scan status for target:', activeTarget.id);
     
     const response = await fetch(
-      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/metabigor-company`
+      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/metabigor-company`
     );
     if (!response.ok) {
       throw new Error('Failed to fetch Metabigor Company scans');
@@ -50,7 +50,7 @@ const monitorMetabigorCompanyScanStatus = async (
       if (mostRecentScan.scan_id && setMetabigorNetworkRanges) {
         try {
           const networkRangesResponse = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/metabigor-company/${mostRecentScan.scan_id}/networks`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/metabigor-company/${mostRecentScan.scan_id}/networks`
           );
           if (networkRangesResponse.ok) {
             const networkRanges = await networkRangesResponse.json();

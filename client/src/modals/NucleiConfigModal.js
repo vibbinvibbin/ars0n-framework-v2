@@ -78,7 +78,7 @@ const NucleiConfigModal = ({
     setLoadingAssets(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/attack-surface-assets/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/attack-surface-assets/${activeTarget.id}`
       );
       
       if (response.ok) {
@@ -100,7 +100,7 @@ const NucleiConfigModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/nuclei`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/nuclei`
       );
       
       if (response.ok) {
@@ -125,7 +125,7 @@ const NucleiConfigModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/nuclei-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/nuclei-config/${activeTarget.id}`
       );
       
       if (response.ok) {
@@ -178,7 +178,7 @@ const NucleiConfigModal = ({
       };
 
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/nuclei-config/${activeTarget.id}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/nuclei-config/${activeTarget.id}`,
         {
           method: 'POST',
           headers: {

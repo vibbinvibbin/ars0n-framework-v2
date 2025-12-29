@@ -682,7 +682,7 @@ function App() {
     const checkApiKeys = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/api-keys`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/api-keys`
         );
         if (!response.ok) {
           throw new Error('Failed to fetch API keys');
@@ -799,7 +799,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-config/${activeTarget.id}`
       );
       
       if (response.ok) {
@@ -815,7 +815,7 @@ function App() {
           try {
             // Fetch all scope targets to find wildcard targets
             const scopeTargetsResponse = await fetch(
-              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/read`
+              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/read`
             );
             
             if (scopeTargetsResponse.ok) {
@@ -840,7 +840,7 @@ function App() {
                 for (const wildcardTarget of wildcardTargets) {
                   try {
                     const liveWebServersResponse = await fetch(
-                      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${wildcardTarget.id}/target-urls`
+                      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/scope-targets/${wildcardTarget.id}/target-urls`
                     );
                     
                     if (liveWebServersResponse.ok) {
@@ -902,7 +902,7 @@ function App() {
         try {
           // Fetch raw results count
           const rawResultsResponse = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentAmassEnumCompanyScan.scan_id}/raw-results`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentAmassEnumCompanyScan.scan_id}/raw-results`
           );
           if (rawResultsResponse.ok) {
             const rawResults = await rawResultsResponse.json();
@@ -913,7 +913,7 @@ function App() {
 
           // Fetch cloud domains count
           const cloudDomainsResponse = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentAmassEnumCompanyScan.scan_id}/cloud-domains`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentAmassEnumCompanyScan.scan_id}/cloud-domains`
           );
           if (cloudDomainsResponse.ok) {
             const cloudDomains = await cloudDomainsResponse.json();
@@ -943,7 +943,7 @@ function App() {
 
           // Fetch DNS records count
           const dnsRecordsResponse = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/dnsx-company/${mostRecentDNSxCompanyScan.scan_id}/dns-records`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/dnsx-company/${mostRecentDNSxCompanyScan.scan_id}/dns-records`
           );
           if (dnsRecordsResponse.ok) {
             const dnsRecords = await dnsRecordsResponse.json();
@@ -972,7 +972,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-intel-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-intel-config/${activeTarget.id}`
       );
       
       if (response.ok) {
@@ -1100,7 +1100,7 @@ function App() {
 
   const handleAddWildcardTarget = async (domain) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/add`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1321,7 +1321,7 @@ function App() {
       const fetchCustomShuffleDNSScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${activeTarget.id}/shufflednscustom-scans`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/scope-targets/${activeTarget.id}/shufflednscustom-scans`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch custom ShuffleDNS scans');
@@ -1389,7 +1389,7 @@ function App() {
         try {
           // First check if there's an active session for this target
           const sessionResponse = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan/sessions?target_id=${activeTarget.id}`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan/sessions?target_id=${activeTarget.id}`
           );
           
           if (sessionResponse.ok) {
@@ -1406,7 +1406,7 @@ function App() {
           
           // Then check the current step
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan-state/${activeTarget.id}`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan-state/${activeTarget.id}`
           );
           
           if (response.ok) {
@@ -1539,7 +1539,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass/${mostRecentScan.scan_id}/subdomain`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass/${mostRecentScan.scan_id}/subdomain`
         );
         if (!response.ok) {
           throw new Error('Failed to fetch subdomains');
@@ -1566,7 +1566,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass/${mostRecentScan.scan_id}/cloud`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass/${mostRecentScan.scan_id}/cloud`
         );
         if (!response.ok) {
           throw new Error('Failed to fetch cloud domains');
@@ -1607,7 +1607,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass/${mostRecentScan.scan_id}/dns`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass/${mostRecentScan.scan_id}/dns`
         );
         if (!response.ok) {
           throw new Error('Failed to fetch DNS records');
@@ -1656,7 +1656,7 @@ function App() {
       }
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/add`, {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/add`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1693,7 +1693,7 @@ function App() {
     if (!idToDelete) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/delete/${idToDelete}`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/delete/${idToDelete}`, {
         method: 'DELETE',
       });
 
@@ -1723,7 +1723,7 @@ function App() {
   const fetchScopeTargets = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/read`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/read`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch scope targets');
@@ -1745,7 +1745,7 @@ function App() {
           // Call the API to set the first target as active
           try {
             await fetch(
-              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${data[0].id}/activate`,
+              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${data[0].id}/activate`,
               {
                 method: 'POST',
               }
@@ -1833,7 +1833,7 @@ function App() {
     // Update the backend to set this target as active
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/activate`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/activate`,
         {
           method: 'POST',
         }
@@ -1851,7 +1851,7 @@ function App() {
       if (target.id) {
         // Fetch screenshot scans
         const screenshotResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/nuclei-screenshot`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/nuclei-screenshot`
         );
         if (screenshotResponse.ok) {
           const screenshotData = await screenshotResponse.json();
@@ -1864,7 +1864,7 @@ function App() {
 
         // Fetch metadata scans
         const metadataResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/metadata`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/metadata`
         );
         if (metadataResponse.ok) {
           const metadataData = await metadataResponse.json();
@@ -1877,7 +1877,7 @@ function App() {
 
         // Fetch CEWL scans
         const cewlResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/cewl`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/cewl`
         );
         if (cewlResponse.ok) {
           const cewlData = await cewlResponse.json();
@@ -1890,7 +1890,7 @@ function App() {
 
         // Fetch ShuffleDNS scans
         const shufflednsResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/shuffledns`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/shuffledns`
         );
         if (shufflednsResponse.ok) {
           const shufflednsData = await shufflednsResponse.json();
@@ -1903,7 +1903,7 @@ function App() {
 
         // Fetch ShuffleDNS Custom scans
         const shufflednsCustomResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${target.id}/shufflednscustom-scans`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/scope-targets/${target.id}/shufflednscustom-scans`
         );
         if (shufflednsCustomResponse.ok) {
           const shufflednsCustomData = await shufflednsCustomResponse.json();
@@ -1916,7 +1916,7 @@ function App() {
 
         // Fetch SecurityTrails Company scans
         const securitytrailsResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/securitytrails-company`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/securitytrails-company`
         );
         if (securitytrailsResponse.ok) {
           const securitytrailsData = await securitytrailsResponse.json();
@@ -1935,7 +1935,7 @@ function App() {
 
         // Fetch Censys Company scans
         const censysResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/censys-company`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/censys-company`
         );
         if (censysResponse.ok) {
           const censysData = await censysResponse.json();
@@ -1954,7 +1954,7 @@ function App() {
 
         // Fetch Shodan Company scans
         const shodanResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/shodan-company`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/shodan-company`
         );
         if (shodanResponse.ok) {
           const shodanData = await shodanResponse.json();
@@ -1973,7 +1973,7 @@ function App() {
 
         // Fetch GitHub Recon scans
         const githubResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${target.id}/scans/github-recon`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${target.id}/scans/github-recon`
         );
         if (githubResponse.ok) {
           const githubData = await githubResponse.json();
@@ -2052,7 +2052,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan-config`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan-config`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch auto scan config');
@@ -2061,7 +2061,7 @@ function App() {
       console.log('[AutoScan] Config received from backend:', config);
       // Create session
       const sessionResp = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan/session/start`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan/session/start`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2383,7 +2383,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/nuclei-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/nuclei-config/${activeTarget.id}`
       );
       
       if (response.ok) {
@@ -2522,7 +2522,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/katana-company-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/katana-company-config/${activeTarget.id}`
       );
       
       if (!response.ok) {
@@ -2606,7 +2606,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/google-dorking-domains`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/google-dorking-domains`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2640,7 +2640,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/google-dorking-domains/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/google-dorking-domains/${activeTarget.id}`
       );
       if (response.ok) {
         const domains = await response.json();
@@ -2657,7 +2657,7 @@ function App() {
     try {
       console.log('[fetchNucleiScans] Fetching nuclei scans for target:', activeTarget.id);
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/nuclei`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/nuclei`
       );
 
       if (response.ok) {
@@ -2695,7 +2695,7 @@ function App() {
   const deleteGoogleDorkingDomain = async (domainId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/google-dorking-domains/${domainId}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/google-dorking-domains/${domainId}`,
         { method: 'DELETE' }
       );
 
@@ -2769,7 +2769,7 @@ function App() {
         // Fetch updated counts after consolidation
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/attack-surface-asset-counts/${activeTarget.id}`,
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/attack-surface-asset-counts/${activeTarget.id}`,
             {
               method: 'GET',
               headers: {
@@ -2810,7 +2810,7 @@ function App() {
         // Fetch updated counts after investigation
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/attack-surface-asset-counts/${activeTarget.id}`,
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/attack-surface-asset-counts/${activeTarget.id}`,
             {
               method: 'GET',
               headers: {
@@ -2978,7 +2978,7 @@ function App() {
     
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${activeTarget.id}/target-urls`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/scope-targets/${activeTarget.id}/target-urls`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch target URLs');
@@ -2996,7 +2996,7 @@ function App() {
     
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${activeTarget.id}/target-urls`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/scope-targets/${activeTarget.id}/target-urls`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch target URLs');
@@ -3120,7 +3120,7 @@ function App() {
     
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan-state/${targetId}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan-state/${targetId}`
       );
       
       if (response.ok) {
@@ -3144,7 +3144,7 @@ function App() {
     if (!activeTarget || !activeTarget.id) return;
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan/sessions?target_id=${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan/sessions?target_id=${activeTarget.id}`
       );
       if (response.ok) {
         const rawData = await response.json();
@@ -3239,7 +3239,7 @@ function App() {
       const interval = setInterval(async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/auto-scan-state/${activeTarget.id}`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/auto-scan-state/${activeTarget.id}`
           );
           
           if (response.ok) {
@@ -3307,7 +3307,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/reverse-whois-domains`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/reverse-whois-domains`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -3341,7 +3341,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/reverse-whois-domains/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/reverse-whois-domains/${activeTarget.id}`
       );
       if (response.ok) {
         const domains = await response.json();
@@ -3355,7 +3355,7 @@ function App() {
   const deleteReverseWhoisDomain = async (domainId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/reverse-whois-domains/${domainId}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/reverse-whois-domains/${domainId}`,
         { method: 'DELETE' }
       );
 
@@ -3391,7 +3391,7 @@ function App() {
       const fetchSecurityTrailsCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/securitytrails-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/securitytrails-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch SecurityTrails Company scans');
@@ -3420,7 +3420,7 @@ function App() {
     const checkAllApiKeys = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/api-keys`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/api-keys`
         );
         if (!response.ok) {
           throw new Error('Failed to fetch API keys');
@@ -3498,7 +3498,7 @@ function App() {
     // Re-check all API keys when one is deleted
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/api-keys`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/api-keys`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch API keys');
@@ -3583,7 +3583,7 @@ function App() {
       const fetchCensysCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/censys-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/censys-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Censys Company scans');
@@ -3613,7 +3613,7 @@ function App() {
       const fetchShodanCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/shodan-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/shodan-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Shodan Company scans');
@@ -3650,7 +3650,7 @@ function App() {
       const fetchAmassEnumCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Amass Enum Company scans');
@@ -3669,7 +3669,7 @@ function App() {
               // Fetch raw results to get actual scanned domains count
               if (mostRecentScan.scan_id) {
                 const rawResultsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
                 );
                 if (rawResultsResponse.ok) {
                   const rawResults = await rawResultsResponse.json();
@@ -3682,7 +3682,7 @@ function App() {
 
                 // Fetch cloud domains for the main card display
                 const cloudDomainsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
                 );
                 if (cloudDomainsResponse.ok) {
                   const cloudDomains = await cloudDomainsResponse.json();
@@ -3715,7 +3715,7 @@ function App() {
       const fetchDNSxCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/dnsx-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/dnsx-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch DNSx Company scans');
@@ -3741,7 +3741,7 @@ function App() {
 
                 // Fetch DNS records for the main card display
                 const dnsRecordsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/dnsx-company/${mostRecentScan.scan_id}/dns-records`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/dnsx-company/${mostRecentScan.scan_id}/dns-records`
                 );
                 if (dnsRecordsResponse.ok) {
                   const dnsRecords = await dnsRecordsResponse.json();
@@ -3829,7 +3829,7 @@ function App() {
       const fetchKatanaCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/katana-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/katana-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Katana Company scans');
@@ -3845,7 +3845,7 @@ function App() {
               // Fetch accumulated cloud assets from the backend API
               try {
                 const assetsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/katana-company/${mostRecentScan.scan_id}/cloud-assets`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/katana-company/${mostRecentScan.scan_id}/cloud-assets`
                 );
                 if (assetsResponse.ok) {
                   const assets = await assetsResponse.json();
@@ -3996,7 +3996,7 @@ function App() {
     if (activeTarget) {
       try {
         const mechanismsResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/mechanisms/${activeTarget.id}/examples`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/mechanisms/${activeTarget.id}/examples`
         );
         if (mechanismsResponse.ok) {
           const mechanismsData = await mechanismsResponse.json();
@@ -4009,7 +4009,7 @@ function App() {
       
       try {
         const objectsResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/notable-objects/${activeTarget.id}`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/notable-objects/${activeTarget.id}`
         );
         if (objectsResponse.ok) {
           const objectsData = await objectsResponse.json();
@@ -4022,7 +4022,7 @@ function App() {
 
       try {
         const controlsResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/security-controls/${activeTarget.id}/notes`
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/security-controls/${activeTarget.id}/notes`
         );
         if (controlsResponse.ok) {
           const controlsData = await controlsResponse.json();
@@ -4135,7 +4135,7 @@ function App() {
         const fetchDNSxCompanyScansRefresh = async () => {
           try {
             const response = await fetch(
-              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/dnsx-company`
+              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/dnsx-company`
             );
             if (!response.ok) {
               throw new Error('Failed to fetch DNSx Company scans');
@@ -4159,7 +4159,7 @@ function App() {
         const fetchKatanaCompanyScansRefresh = async () => {
           try {
             const response = await fetch(
-              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/katana-company`
+              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/katana-company`
             );
             if (!response.ok) {
               throw new Error('Failed to fetch Katana Company scans');
@@ -4175,7 +4175,7 @@ function App() {
                 // Fetch accumulated cloud assets for the card count
                 try {
                   const assetsResponse = await fetch(
-                    `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/katana-company/target/${activeTarget.id}/cloud-assets`
+                    `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/katana-company/target/${activeTarget.id}/cloud-assets`
                   );
                   if (assetsResponse.ok) {
                     const assets = await assetsResponse.json();
@@ -4219,7 +4219,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/dnsx-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/dnsx-config/${activeTarget.id}`
       );
       
       if (response.ok) {
@@ -4235,7 +4235,7 @@ function App() {
           try {
             // Fetch all scope targets to find wildcard targets
             const scopeTargetsResponse = await fetch(
-              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/read`
+              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/read`
             );
             
             if (scopeTargetsResponse.ok) {
@@ -4260,7 +4260,7 @@ function App() {
                 for (const wildcardTarget of wildcardTargets) {
                   try {
                     const liveWebServersResponse = await fetch(
-                      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${wildcardTarget.id}/target-urls`
+                      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/scope-targets/${wildcardTarget.id}/target-urls`
                     );
                     
                     if (liveWebServersResponse.ok) {
@@ -4330,7 +4330,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/dnsx-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/dnsx-config/${activeTarget.id}`
       );
       
       if (!response.ok) {
@@ -4383,7 +4383,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-config/${activeTarget.id}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-config/${activeTarget.id}`
       );
       
       if (!response.ok) {
@@ -4436,7 +4436,7 @@ function App() {
       const fetchAmassEnumCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Amass Enum Company scans');
@@ -4455,7 +4455,7 @@ function App() {
               // Fetch raw results to get actual scanned domains count
               if (mostRecentScan.scan_id) {
                 const rawResultsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
                 );
                 if (rawResultsResponse.ok) {
                   const rawResults = await rawResultsResponse.json();
@@ -4468,7 +4468,7 @@ function App() {
 
                 // Fetch cloud domains for the main card display
                 const cloudDomainsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
                 );
                 if (cloudDomainsResponse.ok) {
                   const cloudDomains = await cloudDomainsResponse.json();
@@ -4501,7 +4501,7 @@ function App() {
       const fetchAmassEnumCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Amass Enum Company scans');
@@ -4520,7 +4520,7 @@ function App() {
               // Fetch raw results to get actual scanned domains count
               if (mostRecentScan.scan_id) {
                 const rawResultsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
                 );
                 if (rawResultsResponse.ok) {
                   const rawResults = await rawResultsResponse.json();
@@ -4533,7 +4533,7 @@ function App() {
 
                 // Fetch cloud domains for the main card display
                 const cloudDomainsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
                 );
                 if (cloudDomainsResponse.ok) {
                   const cloudDomains = await cloudDomainsResponse.json();
@@ -4566,7 +4566,7 @@ function App() {
       const fetchAmassEnumCompanyScans = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
+            `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/amass-enum-company`
           );
           if (!response.ok) {
             throw new Error('Failed to fetch Amass Enum Company scans');
@@ -4585,7 +4585,7 @@ function App() {
               // Fetch raw results to get actual scanned domains count
               if (mostRecentScan.scan_id) {
                 const rawResultsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/raw-results`
                 );
                 if (rawResultsResponse.ok) {
                   const rawResults = await rawResultsResponse.json();
@@ -4598,7 +4598,7 @@ function App() {
 
                 // Fetch cloud domains for the main card display
                 const cloudDomainsResponse = await fetch(
-                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
+                  `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-enum-company/${mostRecentScan.scan_id}/cloud-domains`
                 );
                 if (cloudDomainsResponse.ok) {
                   const cloudDomains = await cloudDomainsResponse.json();

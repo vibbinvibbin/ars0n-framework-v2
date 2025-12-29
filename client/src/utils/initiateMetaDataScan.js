@@ -13,7 +13,7 @@ const initiateMetaDataScan = async (
     const body = { scope_target_id: activeTarget.id };
     if (autoScanSessionId) body.auto_scan_session_id = autoScanSessionId;
     const response = await fetch(
-      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/metadata/run`,
+      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/metadata/run`,
       {
         method: 'POST',
         headers: {
@@ -64,7 +64,7 @@ const initiateCompanyMetaDataScan = async (
     };
     
     const response = await fetch(
-      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/metadata/run-company`,
+      `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/metadata/run-company`,
       {
         method: 'POST',
         headers: {

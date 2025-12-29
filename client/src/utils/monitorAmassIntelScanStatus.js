@@ -11,7 +11,7 @@ const monitorAmassIntelScanStatus = (
   const intervalId = setInterval(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${activeTarget.id}/scans/amass-intel`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/amass-intel`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch Amass Intel scans');
@@ -28,7 +28,7 @@ const monitorAmassIntelScanStatus = (
         if (mostRecentScan.scan_id && setAmassIntelNetworkRanges) {
           try {
             const networkRangesResponse = await fetch(
-              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/amass-intel/${mostRecentScan.scan_id}/networks`
+              `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/amass-intel/${mostRecentScan.scan_id}/networks`
             );
             if (networkRangesResponse.ok) {
               const networkRanges = await networkRangesResponse.json();

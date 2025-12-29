@@ -72,7 +72,7 @@ const MetaDataModal = memo(({
 
   const fetchExistingScopeTargets = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/read`);
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/read`);
       if (response.ok) {
         const data = await response.json();
         setExistingScopeTargets(data);
@@ -189,7 +189,7 @@ const MetaDataModal = memo(({
     setDeletingUrls(prev => new Set(prev).add(urlId));
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/target-urls/${urlId}`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/api/target-urls/${urlId}`, {
         method: 'DELETE',
       });
 
@@ -223,7 +223,7 @@ const MetaDataModal = memo(({
         active: false,
       };
       
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/add`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

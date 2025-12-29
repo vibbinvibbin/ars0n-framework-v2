@@ -379,7 +379,7 @@ export const MechanismsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/mechanisms/${activeTarget.id}/examples`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/mechanisms/${activeTarget.id}/examples`
       );
 
       if (!response.ok) {
@@ -415,7 +415,7 @@ export const MechanismsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/mechanisms/${activeTarget.id}/examples`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/mechanisms/${activeTarget.id}/examples`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -460,7 +460,7 @@ export const MechanismsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/mechanisms/examples/${exampleId}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/mechanisms/examples/${exampleId}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -512,7 +512,7 @@ export const MechanismsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/mechanisms/examples/${exampleToDelete}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/mechanisms/examples/${exampleToDelete}`,
         {
           method: 'DELETE'
         }

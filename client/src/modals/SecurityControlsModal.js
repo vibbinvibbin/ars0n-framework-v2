@@ -335,7 +335,7 @@ export const SecurityControlsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/security-controls/${activeTarget.id}/notes`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/security-controls/${activeTarget.id}/notes`
       );
 
       if (!response.ok) {
@@ -371,7 +371,7 @@ export const SecurityControlsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/security-controls/${activeTarget.id}/notes`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/security-controls/${activeTarget.id}/notes`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -414,7 +414,7 @@ export const SecurityControlsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/security-controls/notes/${noteId}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/security-controls/notes/${noteId}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -464,7 +464,7 @@ export const SecurityControlsModal = ({
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/security-controls/notes/${noteToDelete}`,
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/security-controls/notes/${noteToDelete}`,
         {
           method: 'DELETE'
         }

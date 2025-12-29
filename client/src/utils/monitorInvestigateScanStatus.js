@@ -15,7 +15,7 @@ const monitorInvestigateScanStatus = (
   const interval = setInterval(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${targetId}/scans/investigate`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${targetId}/scans/investigate`
       );
       
       if (!response.ok) {
@@ -38,7 +38,7 @@ const monitorInvestigateScanStatus = (
       }
     } catch (error) {
       console.error('Error monitoring investigate scan status:', error);
-      console.error(`Failed URL: ${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${targetId}/scans/investigate`);
+      console.error(`Failed URL: ${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${targetId}/scans/investigate`);
       setIsInvestigateScanning(false);
       clearInterval(interval);
     }

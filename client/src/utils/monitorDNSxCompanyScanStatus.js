@@ -9,7 +9,7 @@ const monitorDNSxCompanyScanStatus = async (
   const poll = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/dnsx-company/status/${scanId}`
+        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/dnsx-company/status/${scanId}`
       );
       
       if (response.ok) {
@@ -26,7 +26,7 @@ const monitorDNSxCompanyScanStatus = async (
           if (setDNSxCompanyScans) {
             try {
               const scansResponse = await fetch(
-                `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/${scan.scope_target_id}/scans/dnsx-company`
+                `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${scan.scope_target_id}/scans/dnsx-company`
               );
               if (scansResponse.ok) {
                 const scansData = await scansResponse.json();
@@ -41,7 +41,7 @@ const monitorDNSxCompanyScanStatus = async (
           if (scan.status === 'success' && setDNSxCompanyDNSRecords) {
             try {
               const recordsResponse = await fetch(
-                `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/dnsx-company/${scanId}/dns-records`
+                `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/dnsx-company/${scanId}/dns-records`
               );
               if (recordsResponse.ok) {
                 const recordsData = await recordsResponse.json();
