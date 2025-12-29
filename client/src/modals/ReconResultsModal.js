@@ -12,6 +12,7 @@ export const ReconResultsModal = ({
     shuffleDNSResults,
     gospiderResults,
     subdomainizerResults,
+    thcSubdomainResults,
     cewlResults
 }) => {
     const getSubdomainCount = (results, tool) => {
@@ -197,7 +198,8 @@ export const ReconResultsModal = ({
         { name: 'ShuffleDNS', results: shuffleDNSResults, link: 'https://github.com/projectdiscovery/shuffledns' },
         { name: 'CeWL + ShuffleDNS', results: cewlResults, link: 'https://github.com/digininja/CeWL', tool: 'cewl' },
         { name: 'GoSpider', results: gospiderResults, link: 'https://github.com/jaeles-project/gospider', tool: 'gospider' },
-        { name: 'Subdomainizer', results: subdomainizerResults, link: 'https://github.com/nsonaniya2010/SubDomainizer', tool: 'subdomainizer' }
+        { name: 'Subdomainizer', results: subdomainizerResults, link: 'https://github.com/nsonaniya2010/SubDomainizer', tool: 'subdomainizer' },
+        { name: 'THC Subdomain', results: thcSubdomainResults, link: 'https://ip.thc.org/', tool: 'thc_subdomain' }
     ];
 
     return (

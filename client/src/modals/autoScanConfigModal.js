@@ -15,13 +15,14 @@ function AutoScanConfigModal({ show, handleClose, config, onSave, loading: exter
     { id: 'consolidate_httpx_round2', name: 'Consolidate & Live Web Servers (Round 2)' },
     { id: 'gospider', name: 'GoSpider' },
     { id: 'subdomainizer', name: 'Subdomainizer' },
+    { id: 'thc_subdomain', name: 'THC Subdomain' },
     { id: 'consolidate_httpx_round3', name: 'Consolidate & Live Web Servers (Round 3)' },
     { id: 'nuclei_screenshot', name: 'Nuclei Screenshot' },
     { id: 'metadata', name: 'Metadata' }
   ];
 
   const defaultConfig = {
-    amass: true, sublist3r: true, assetfinder: true, gau: true, ctl: true, subfinder: true, consolidate_httpx_round1: true, shuffledns: true, cewl: true, consolidate_httpx_round2: true, gospider: true, subdomainizer: true, consolidate_httpx_round3: true, nuclei_screenshot: true, metadata: true, maxConsolidatedSubdomains: 2500, maxLiveWebServers: 500
+    amass: true, sublist3r: true, assetfinder: true, gau: true, ctl: true, subfinder: true, consolidate_httpx_round1: true, shuffledns: true, cewl: true, consolidate_httpx_round2: true, gospider: true, subdomainizer: true, thc_subdomain: true, consolidate_httpx_round3: true, nuclei_screenshot: true, metadata: true, maxConsolidatedSubdomains: 2500, maxLiveWebServers: 500
   };
 
   const scanProfiles = {
@@ -67,6 +68,7 @@ function AutoScanConfigModal({ show, handleClose, config, onSave, loading: exter
         consolidate_httpx_round2: false, 
         gospider: false, 
         subdomainizer: false, 
+        thc_subdomain: false, 
         consolidate_httpx_round3: false, 
         nuclei_screenshot: false, 
         metadata: false
@@ -88,6 +90,7 @@ function AutoScanConfigModal({ show, handleClose, config, onSave, loading: exter
         consolidate_httpx_round2: true, 
         gospider: true, 
         subdomainizer: false, 
+        thc_subdomain: false, 
         consolidate_httpx_round3: true, 
         nuclei_screenshot: true, 
         metadata: true
@@ -109,6 +112,7 @@ function AutoScanConfigModal({ show, handleClose, config, onSave, loading: exter
         consolidate_httpx_round2: true, 
         gospider: true, 
         subdomainizer: true, 
+        thc_subdomain: true, 
         consolidate_httpx_round3: true, 
         nuclei_screenshot: true, 
         metadata: true
@@ -130,6 +134,7 @@ function AutoScanConfigModal({ show, handleClose, config, onSave, loading: exter
         consolidate_httpx_round2: true, 
         gospider: true, 
         subdomainizer: true, 
+        thc_subdomain: true, 
         consolidate_httpx_round3: true, 
         nuclei_screenshot: false, 
         metadata: false

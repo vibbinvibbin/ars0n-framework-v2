@@ -1,9 +1,9 @@
 import { Row, Col, Button, Card, Alert, Spinner, ProgressBar } from 'react-bootstrap';
-import { useState, useEffect, useRef, memo, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AutoScanConfigModal from '../modals/autoScanConfigModal';
 import { getHttpxResultsCount } from '../utils/miscUtils';
 
-const ManageScopeTargets = memo(function ManageScopeTargets({ 
+function ManageScopeTargets({ 
   handleOpen, 
   handleActiveModalOpen, 
   activeTarget, 
@@ -327,6 +327,7 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
         'httpx_round2': 'consolidate_httpx_round2',
         'gospider': 'gospider',
         'subdomainizer': 'subdomainizer',
+        'thc_subdomain': 'thc_subdomain',
         'consolidate_round3': 'consolidate_httpx_round3',
         'httpx_round3': 'consolidate_httpx_round3',
         'nuclei-screenshot': 'nuclei_screenshot',
@@ -349,13 +350,14 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
       .replace('Httpx', 'HTTPX')
       .replace('Sublist3r', 'Sublist3r')
       .replace('Subdomainizer', 'Subdomainizer')
+      .replace('Thc Subdomain', 'THC Subdomain')
       .replace('Cewl', 'CeWL')
       .replace('Ctl', 'CTL')
       .replace('Gau', 'GAU')
       .replace('Nuclei-screenshot', 'Nuclei Screenshot');
   };
 
-  const currentProgress = useMemo(() => {
+  const calculateProgress = () => {
     // If the display status is idle, always return 0
     if (displayStatus === 'idle' || !autoScanConfig || !autoScanCurrentStep || autoScanCurrentStep === 'idle') return 0;
     
@@ -368,7 +370,7 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
       'consolidate', 'httpx', 
       'shuffledns', 'shuffledns_cewl',
       'consolidate_round2', 'httpx_round2',
-      'gospider', 'subdomainizer',
+      'gospider', 'subdomainizer', 'thc_subdomain',
       'consolidate_round3', 'httpx_round3',
       'nuclei-screenshot', 'metadata', 'completed'
     ];
@@ -389,6 +391,7 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
       'httpx_round2': 'consolidate_httpx_round2',
       'gospider': 'gospider',
       'subdomainizer': 'subdomainizer',
+      'thc_subdomain': 'thc_subdomain',
       'consolidate_round3': 'consolidate_httpx_round3',
       'httpx_round3': 'consolidate_httpx_round3',
       'nuclei-screenshot': 'nuclei_screenshot',
@@ -448,7 +451,7 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
     
     // Cap at 95% until completed
     return Math.min(progress, 95);
-  }, [displayStatus, autoScanConfig, autoScanCurrentStep]);
+  };
 
   // Add CSS for flashing text
   const flashingTextStyle = `
@@ -592,11 +595,11 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
                           <div className="d-flex justify-content-between mb-1">
                             <span className="text-white-50 small">Progress</span>
                             <span className="text-white small">
-                              {displayStatus === 'idle' ? '0' : currentProgress}%
+                              {displayStatus === 'idle' ? '0' : calculateProgress()}%
                             </span>
                           </div>
                           <ProgressBar 
-                            now={currentProgress} 
+                            now={calculateProgress()} 
                             variant="danger" 
                             className="bg-dark" 
                             style={{ height: '8px' }}
@@ -698,6 +701,6 @@ const ManageScopeTargets = memo(function ManageScopeTargets({
       />
     </>
   );
-});
+}
 
 export default ManageScopeTargets;

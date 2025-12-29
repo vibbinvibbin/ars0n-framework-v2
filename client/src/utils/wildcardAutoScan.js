@@ -15,6 +15,7 @@ const AUTO_SCAN_STEPS = {
   HTTPX_ROUND2: 'httpx_round2', // 10.75
   GOSPIDER: 'gospider', // 11
   SUBDOMAINIZER: 'subdomainizer', // 12
+  THC_SUBDOMAIN: 'thc_subdomain', // 12.25
   CONSOLIDATE_ROUND3: 'consolidate_round3', // 12.5
   HTTPX_ROUND3: 'httpx_round3', // 12.75
   NUCLEI_SCREENSHOT: 'nuclei-screenshot', // 13
@@ -47,6 +48,7 @@ const updateAutoScanState = async (targetId, currentStep, isPaused = false, isCa
         [AUTO_SCAN_STEPS.HTTPX_ROUND2]: 'consolidate_httpx_round2',
         [AUTO_SCAN_STEPS.GOSPIDER]: 'gospider',
         [AUTO_SCAN_STEPS.SUBDOMAINIZER]: 'subdomainizer',
+        [AUTO_SCAN_STEPS.THC_SUBDOMAIN]: 'thc_subdomain',
         [AUTO_SCAN_STEPS.CONSOLIDATE_ROUND3]: 'consolidate_httpx_round3',
         [AUTO_SCAN_STEPS.HTTPX_ROUND3]: 'consolidate_httpx_round3',
         [AUTO_SCAN_STEPS.NUCLEI_SCREENSHOT]: 'nuclei_screenshot',

@@ -10,6 +10,7 @@ import initiateMetaDataScan from './initiateMetaDataScan';
 import fetchHttpxScans from './fetchHttpxScans';
 import initiateGoSpiderScan from './initiateGoSpiderScan';
 import initiateSubdomainizerScan from './initiateSubdomainizerScan';
+import initiateTHCSubdomainScan from './initiateTHCSubdomainScan';
 import initiateAmassScan from './initiateAmassScan';
 import { getHttpxResultsCount } from './miscUtils';
 
@@ -29,6 +30,7 @@ const getAutoScanSteps = (
   setIsCeWLScanning,
   setIsGoSpiderScanning,
   setIsSubdomainizerScanning,
+  setIsTHCSubdomainScanning,
   setIsNucleiScreenshotScanning,
   setIsMetaDataScanning,
   // Scans state updaters
@@ -43,6 +45,7 @@ const getAutoScanSteps = (
   setCeWLScans,
   setGoSpiderScans,
   setSubdomainizerScans,
+  setTHCSubdomainScans,
   setNucleiScreenshotScans,
   setMetaDataScans,
   setSubdomains,
@@ -59,6 +62,7 @@ const getAutoScanSteps = (
   setMostRecentCeWLScan,
   setMostRecentGoSpiderScan,
   setMostRecentSubdomainizerScan,
+  setMostRecentTHCSubdomainScan,
   setMostRecentNucleiScreenshotScan,
   setMostRecentMetaDataScan,
   setMostRecentShuffleDNSCustomScan,
@@ -74,6 +78,7 @@ const getAutoScanSteps = (
   setMostRecentCeWLScanStatus,
   setMostRecentGoSpiderScanStatus,
   setMostRecentSubdomainizerScanStatus,
+  setMostRecentTHCSubdomainScanStatus,
   setMostRecentNucleiScreenshotScanStatus,
   setMostRecentMetaDataScanStatus,
   setMostRecentShuffleDNSCustomScanStatus,
@@ -1101,6 +1106,62 @@ const getAutoScanSteps = (
         console.log('[AutoScan] Step: subdomainizer completed.');
       } catch (error) {
         console.error('[AutoScan] Step: subdomainizer ERROR:', error);
+      }
+    }},
+    { name: AUTO_SCAN_STEPS.THC_SUBDOMAIN, action: async () => {
+      if (config && config.thc_subdomain === false) {
+        console.log('[AutoScan] Step: thc_subdomain is DISABLED in config. Skipping.');
+        return;
+      }
+      console.log('[AutoScan] Step: thc_subdomain is ENABLED. Running.');
+      console.log("Starting THC Subdomain Scan...");
+      setAutoScanCurrentStep(AUTO_SCAN_STEPS.THC_SUBDOMAIN);
+      await updateAutoScanState(activeTarget.id, AUTO_SCAN_STEPS.THC_SUBDOMAIN);
+      
+      try {
+        // Start the scan
+        await initiateTHCSubdomainScan({
+          activeTarget,
+          setIsTHCSubdomainScanning,
+          setMostRecentTHCSubdomainScan,
+          setMostRecentTHCSubdomainScanStatus,
+          autoScanSessionId
+        });
+        
+        // Wait for scan completion
+        const completedScan = await waitForScanCompletion(
+          'thc-subdomain',
+          activeTarget.id,
+          setIsTHCSubdomainScanning,
+          setMostRecentTHCSubdomainScanStatus,
+          setMostRecentTHCSubdomainScan
+        );
+        
+        // Explicitly fetch the latest results to update UI
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}/scopetarget/${activeTarget.id}/scans/thc-subdomain`
+        );
+        
+        if (response.ok) {
+          const scans = await response.json();
+          setTHCSubdomainScans(scans || []);
+          
+          if (Array.isArray(scans) && scans.length > 0) {
+            // Find the most recent scan
+            const mostRecentScan = scans.reduce((latest, scan) => {
+              const scanDate = new Date(scan.created_at);
+              return scanDate > new Date(latest.created_at) ? scan : latest;
+            }, scans[0]);
+            
+            // Update the UI state
+            setMostRecentTHCSubdomainScan(mostRecentScan);
+            setMostRecentTHCSubdomainScanStatus(mostRecentScan.status);
+          }
+        }
+        
+        console.log('[AutoScan] Step: thc_subdomain completed.');
+      } catch (error) {
+        console.error('[AutoScan] Step: thc_subdomain ERROR:', error);
       }
     }},
     { name: AUTO_SCAN_STEPS.CONSOLIDATE_ROUND3, action: async () => {

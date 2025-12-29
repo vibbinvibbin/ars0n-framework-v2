@@ -342,6 +342,22 @@ func createTables() {
 			auto_scan_session_id UUID REFERENCES auto_scan_sessions(id) ON DELETE SET NULL
 		);`,
 
+		`CREATE TABLE IF NOT EXISTS thc_subdomain_scans (
+			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			scan_id UUID NOT NULL UNIQUE,
+			domain TEXT NOT NULL,
+			status VARCHAR(50) NOT NULL,
+			result TEXT,
+			error TEXT,
+			stdout TEXT,
+			stderr TEXT,
+			command TEXT,
+			execution_time TEXT,
+			created_at TIMESTAMP DEFAULT NOW(),
+			scope_target_id UUID REFERENCES scope_targets(id) ON DELETE CASCADE,
+			auto_scan_session_id UUID REFERENCES auto_scan_sessions(id) ON DELETE SET NULL
+		);`,
+
 		`CREATE TABLE IF NOT EXISTS nuclei_screenshots (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			scan_id UUID NOT NULL UNIQUE,
@@ -512,167 +528,6 @@ func createTables() {
 			command TEXT,
 			execution_time TEXT,
 			created_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS katana_url_scans (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scan_id UUID NOT NULL UNIQUE,
-			url TEXT NOT NULL,
-			status VARCHAR(50) NOT NULL,
-			result TEXT,
-			error TEXT,
-			stdout TEXT,
-			stderr TEXT,
-			command TEXT,
-			execution_time TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			scope_target_id UUID REFERENCES scope_targets(id) ON DELETE CASCADE
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS linkfinder_url_scans (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scan_id UUID NOT NULL UNIQUE,
-			url TEXT NOT NULL,
-			status VARCHAR(50) NOT NULL,
-			result TEXT,
-			error TEXT,
-			stdout TEXT,
-			stderr TEXT,
-			command TEXT,
-			execution_time TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			scope_target_id UUID REFERENCES scope_targets(id) ON DELETE CASCADE
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS waybackurls_scans (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scan_id UUID NOT NULL UNIQUE,
-			url TEXT NOT NULL,
-			status VARCHAR(50) NOT NULL,
-			result TEXT,
-			error TEXT,
-			stdout TEXT,
-			stderr TEXT,
-			command TEXT,
-			execution_time TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			scope_target_id UUID REFERENCES scope_targets(id) ON DELETE CASCADE
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS gau_url_scans (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scan_id UUID NOT NULL UNIQUE,
-			url TEXT NOT NULL,
-			status VARCHAR(50) NOT NULL,
-			result TEXT,
-			error TEXT,
-			stdout TEXT,
-			stderr TEXT,
-			command TEXT,
-			execution_time TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			scope_target_id UUID REFERENCES scope_targets(id) ON DELETE CASCADE
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS ffuf_url_scans (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scan_id UUID NOT NULL UNIQUE,
-			url TEXT NOT NULL,
-			status VARCHAR(50) NOT NULL,
-			result TEXT,
-			error TEXT,
-			stdout TEXT,
-			stderr TEXT,
-			command TEXT,
-			execution_time TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			scope_target_id UUID REFERENCES scope_targets(id) ON DELETE CASCADE
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS ffuf_configs (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scope_target_id UUID NOT NULL UNIQUE REFERENCES scope_targets(id) ON DELETE CASCADE,
-			config JSONB NOT NULL,
-			created_at TIMESTAMP DEFAULT NOW(),
-			updated_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS ffuf_wordlists (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			name TEXT NOT NULL,
-			path TEXT NOT NULL,
-			size INTEGER DEFAULT 0,
-			file_size BIGINT DEFAULT 0,
-			created_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS ffuf_scans (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scan_id UUID NOT NULL UNIQUE,
-			scope_target_id UUID NOT NULL REFERENCES scope_targets(id) ON DELETE CASCADE,
-			config_id UUID REFERENCES ffuf_configs(id) ON DELETE SET NULL,
-			status VARCHAR(50) NOT NULL,
-			result TEXT,
-			error TEXT,
-			stdout TEXT,
-			stderr TEXT,
-			command TEXT,
-			execution_time TEXT,
-			created_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS application_questions_answers (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scope_target_id UUID NOT NULL REFERENCES scope_targets(id) ON DELETE CASCADE,
-			question TEXT NOT NULL,
-			answer TEXT NOT NULL,
-			created_at TIMESTAMP DEFAULT NOW(),
-			updated_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS mechanisms_examples (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scope_target_id UUID NOT NULL REFERENCES scope_targets(id) ON DELETE CASCADE,
-			mechanism TEXT NOT NULL,
-			url TEXT NOT NULL,
-			notes TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			updated_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS notable_objects (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scope_target_id UUID NOT NULL REFERENCES scope_targets(id) ON DELETE CASCADE,
-			object_name TEXT NOT NULL,
-			object_json TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			updated_at TIMESTAMP DEFAULT NOW(),
-			UNIQUE(scope_target_id, object_name)
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS security_controls_notes (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scope_target_id UUID NOT NULL REFERENCES scope_targets(id) ON DELETE CASCADE,
-			control_name TEXT NOT NULL,
-			note TEXT NOT NULL,
-			created_at TIMESTAMP DEFAULT NOW(),
-			updated_at TIMESTAMP DEFAULT NOW()
-		);`,
-
-		`CREATE TABLE IF NOT EXISTS threat_model (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			scope_target_id UUID NOT NULL REFERENCES scope_targets(id) ON DELETE CASCADE,
-			category TEXT NOT NULL,
-			url TEXT NOT NULL,
-			mechanism TEXT,
-			target_object TEXT,
-			steps TEXT,
-			security_controls TEXT,
-			impact_customer_data TEXT,
-			impact_attacker_scope TEXT,
-			impact_company_reputation TEXT,
-			created_at TIMESTAMP DEFAULT NOW(),
-			updated_at TIMESTAMP DEFAULT NOW()
 		);`,
 
 		`CREATE TABLE IF NOT EXISTS nuclei_scans (
@@ -1308,6 +1163,7 @@ func createTables() {
 		DELETE FROM shufflednscustom_scans WHERE status = 'pending';
 		DELETE FROM gospider_scans WHERE status = 'pending';
 		DELETE FROM subdomainizer_scans WHERE status = 'pending';
+		DELETE FROM thc_subdomain_scans WHERE status = 'pending';
 		DELETE FROM nuclei_screenshots WHERE status = 'pending';
 		DELETE FROM metadata_scans WHERE status = 'pending';
 		DELETE FROM ip_port_scans WHERE status = 'pending';

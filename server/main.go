@@ -145,6 +145,9 @@ func main() {
 	r.HandleFunc("/subdomainizer/run", utils.RunSubdomainizerScan).Methods("POST", "OPTIONS")
 	r.HandleFunc("/subdomainizer/{scan_id}", utils.GetSubdomainizerScanStatus).Methods("GET", "OPTIONS")
 	r.HandleFunc("/scopetarget/{id}/scans/subdomainizer", utils.GetSubdomainizerScansForScopeTarget).Methods("GET", "OPTIONS")
+	r.HandleFunc("/thc-subdomain/run", utils.RunTHCSubdomainScan).Methods("POST", "OPTIONS")
+	r.HandleFunc("/thc-subdomain/{scan_id}", utils.GetTHCSubdomainScanStatus).Methods("GET", "OPTIONS")
+	r.HandleFunc("/scopetarget/{id}/scans/thc-subdomain", utils.GetTHCSubdomainScansForScopeTarget).Methods("GET", "OPTIONS")
 	r.HandleFunc("/scopetarget/{id}/nuclei-screenshot/run", utils.RunNucleiScreenshotScan).Methods("POST", "OPTIONS")
 	r.HandleFunc("/scopetarget/{id}/scans/nuclei-screenshot", utils.GetNucleiScreenshotScansForScopeTarget).Methods("GET", "OPTIONS")
 	r.HandleFunc("/nuclei-screenshot/run", utils.RunNucleiScreenshotScan).Methods("POST", "OPTIONS")
@@ -160,7 +163,6 @@ func main() {
 	r.HandleFunc("/investigate/{scan_id}", utils.GetInvestigateScanStatus).Methods("GET", "OPTIONS")
 	r.HandleFunc("/scopetarget/{id}/scans/investigate", utils.GetInvestigateScansForScopeTarget).Methods("GET", "OPTIONS")
 	r.HandleFunc("/api/target-urls/{id}/roi-score", utils.UpdateTargetURLROIScore).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/api/target-urls/{id}", utils.DeleteTargetURL).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/user/settings", getUserSettings).Methods("GET", "OPTIONS")
 	r.HandleFunc("/user/settings", updateUserSettings).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/export-data", utils.HandleExportData).Methods("POST", "OPTIONS")
@@ -188,9 +190,6 @@ func main() {
 	r.HandleFunc("/api/api-keys", createAPIKey).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/api-keys/{id}", updateAPIKey).Methods("PUT", "OPTIONS")
 	r.HandleFunc("/api/api-keys/{id}", deleteAPIKey).Methods("DELETE", "OPTIONS")
-	r.HandleFunc("/api/hackerone/test-key", utils.TestHackerOneAPIKey).Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/hackerone/program", utils.GetHackerOneProgram).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/hackerone/programs", utils.ListHackerOnePrograms).Methods("GET", "OPTIONS")
 
 	// AI API Keys routes
 	r.HandleFunc("/api/ai-api-keys", getAiAPIKeys).Methods("GET", "OPTIONS")
@@ -278,61 +277,6 @@ func main() {
 	// Burpsuite populate route
 	r.HandleFunc("/burpsuite/populate", populateBurpsuite).Methods("POST", "OPTIONS")
 
-	// API Populator route
-	r.HandleFunc("/api-populator/process", processApiEndpoint).Methods("POST", "OPTIONS")
-
-	// URL Workflow scan routes
-	r.HandleFunc("/katana-url/run", utils.RunKatanaURLScan).Methods("POST", "OPTIONS")
-	r.HandleFunc("/katana-url/status/{scan_id}", utils.GetKatanaURLScanStatus).Methods("GET", "OPTIONS")
-	r.HandleFunc("/scopetarget/{id}/scans/katana-url", utils.GetKatanaURLScansForScopeTarget).Methods("GET", "OPTIONS")
-	
-	r.HandleFunc("/linkfinder-url/run", utils.RunLinkFinderURLScan).Methods("POST", "OPTIONS")
-	r.HandleFunc("/linkfinder-url/status/{scan_id}", utils.GetLinkFinderURLScanStatus).Methods("GET", "OPTIONS")
-	r.HandleFunc("/scopetarget/{id}/scans/linkfinder-url", utils.GetLinkFinderURLScansForScopeTarget).Methods("GET", "OPTIONS")
-	
-	r.HandleFunc("/waybackurls/run", utils.RunWaybackURLsScan).Methods("POST", "OPTIONS")
-	r.HandleFunc("/waybackurls/status/{scan_id}", utils.GetWaybackURLsScanStatus).Methods("GET", "OPTIONS")
-	r.HandleFunc("/scopetarget/{id}/scans/waybackurls", utils.GetWaybackURLsScansForScopeTarget).Methods("GET", "OPTIONS")
-	
-	r.HandleFunc("/gau-url/run", utils.RunGAUURLScan).Methods("POST", "OPTIONS")
-	r.HandleFunc("/gau-url/status/{scan_id}", utils.GetGAUURLScanStatus).Methods("GET", "OPTIONS")
-	r.HandleFunc("/scopetarget/{id}/scans/gau-url", utils.GetGAUURLScansForScopeTarget).Methods("GET", "OPTIONS")
-	
-	r.HandleFunc("/ffuf-url/run", utils.RunFFUFURLScan).Methods("POST", "OPTIONS")
-	r.HandleFunc("/ffuf-url/status/{scan_id}", utils.GetFFUFURLScanStatus).Methods("GET", "OPTIONS")
-	r.HandleFunc("/scopetarget/{id}/scans/ffuf-url", utils.GetFFUFURLScansForScopeTarget).Methods("GET", "OPTIONS")
-
-	r.HandleFunc("/ffuf-config/{scope_target_id}", utils.SaveFFUFConfig).Methods("POST", "OPTIONS")
-	r.HandleFunc("/ffuf-config/{scope_target_id}", utils.GetFFUFConfig).Methods("GET", "OPTIONS")
-	r.HandleFunc("/ffuf-wordlists/upload", utils.UploadFFUFWordlist).Methods("POST", "OPTIONS")
-	r.HandleFunc("/ffuf-wordlists", utils.GetFFUFWordlists).Methods("GET", "OPTIONS")
-	r.HandleFunc("/ffuf-wordlists/{wordlist_id}", utils.DeleteFFUFWordlist).Methods("DELETE", "OPTIONS")
-
-	r.HandleFunc("/application-questions/{scope_target_id}/answers", utils.GetApplicationQuestionsAnswers).Methods("GET", "OPTIONS")
-	r.HandleFunc("/application-questions/{scope_target_id}/answers", utils.CreateApplicationQuestionAnswer).Methods("POST", "OPTIONS")
-	r.HandleFunc("/application-questions/answers/{answer_id}", utils.UpdateApplicationQuestionAnswer).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/application-questions/answers/{answer_id}", utils.DeleteApplicationQuestionAnswer).Methods("DELETE", "OPTIONS")
-
-	r.HandleFunc("/mechanisms/{scope_target_id}/examples", utils.GetMechanismsExamples).Methods("GET", "OPTIONS")
-	r.HandleFunc("/mechanisms/{scope_target_id}/examples", utils.CreateMechanismExample).Methods("POST", "OPTIONS")
-	r.HandleFunc("/mechanisms/examples/{example_id}", utils.UpdateMechanismExample).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/mechanisms/examples/{example_id}", utils.DeleteMechanismExample).Methods("DELETE", "OPTIONS")
-
-	r.HandleFunc("/notable-objects/{scope_target_id}", utils.GetNotableObjects).Methods("GET", "OPTIONS")
-	r.HandleFunc("/notable-objects/{scope_target_id}", utils.CreateNotableObject).Methods("POST", "OPTIONS")
-	r.HandleFunc("/notable-objects/{object_id}", utils.UpdateNotableObject).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/notable-objects/{object_id}", utils.DeleteNotableObject).Methods("DELETE", "OPTIONS")
-
-	r.HandleFunc("/security-controls/{scope_target_id}/notes", utils.GetSecurityControlsNotes).Methods("GET", "OPTIONS")
-	r.HandleFunc("/security-controls/{scope_target_id}/notes", utils.CreateSecurityControlNote).Methods("POST", "OPTIONS")
-	r.HandleFunc("/security-controls/notes/{note_id}", utils.UpdateSecurityControlNote).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/security-controls/notes/{note_id}", utils.DeleteSecurityControlNote).Methods("DELETE", "OPTIONS")
-
-	r.HandleFunc("/threat-model/{scope_target_id}", utils.GetThreatModel).Methods("GET", "OPTIONS")
-	r.HandleFunc("/threat-model/{scope_target_id}", utils.CreateThreatModel).Methods("POST", "OPTIONS")
-	r.HandleFunc("/threat-model/{threat_id}", utils.UpdateThreatModel).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/threat-model/{threat_id}", utils.DeleteThreatModel).Methods("DELETE", "OPTIONS")
-
 	log.Println("API server started on :8443")
 	http.ListenAndServe(":8443", r)
 }
@@ -341,7 +285,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-HackerOne-API-Key")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
@@ -2478,54 +2422,6 @@ func populateBurpsuite(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"status": "success",
 		"message": fmt.Sprintf("Successfully populated Burpsuite with %d URLs", len(requestBody.URLs)),
-	})
-}
-
-func processApiEndpoint(w http.ResponseWriter, r *http.Request) {
-	var requestBody struct {
-		Method            string                 `json:"method"`
-		Path              string                 `json:"path"`
-		BaseURL           string                 `json:"baseUrl"`
-		Body              interface{}            `json:"body"`
-		APIKey            string                 `json:"apiKey"`
-		ProxyIP           string                 `json:"proxyIP"`
-		ProxyPort         int                    `json:"proxyPort"`
-		Parameters        []interface{}          `json:"parameters"`
-		ManualInputValues map[string]interface{} `json:"manualInputValues"`
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if requestBody.Method == "" || requestBody.Path == "" {
-		http.Error(w, "Method and Path are required", http.StatusBadRequest)
-		return
-	}
-
-	err = utils.ProcessApiRequest(
-		requestBody.Method,
-		requestBody.Path,
-		requestBody.BaseURL,
-		requestBody.Body,
-		requestBody.APIKey,
-		requestBody.ProxyIP,
-		requestBody.ProxyPort,
-		requestBody.Parameters,
-		requestBody.ManualInputValues,
-	)
-	if err != nil {
-		log.Printf("[ERROR] Failed to process API endpoint: %v", err)
-		http.Error(w, fmt.Sprintf("Failed to process API endpoint: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"status":  "success",
-		"message": fmt.Sprintf("Successfully processed %s %s", requestBody.Method, requestBody.Path),
 	})
 }
 

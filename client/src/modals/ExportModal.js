@@ -15,6 +15,7 @@ function ExportModal({ show, handleClose }) {
     shuffledns: true,
     gospider: true,
     subdomainizer: true,
+    thc_subdomain: true,
     roi: true,
     subdomains: true,
     cloud_enum: true,
@@ -233,6 +234,11 @@ function ExportModal({ show, handleClose }) {
       id: 'subdomainizer',
       label: 'Subdomainizer',
       description: 'Subdomain discovery through JavaScript files and external sources.'
+    },
+    {
+      id: 'thc_subdomain',
+      label: 'THC Subdomain',
+      description: 'Subdomain discovery using THC\'s comprehensive subdomain database.'
     },
     {
       id: 'cewl',
