@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import AddScopeTargetModal from './modals/addScopeTargetModal.js';
 import SelectActiveScopeTargetModal from './modals/selectActiveScopeTargetModal.js';
 import { DNSRecordsModal, SubdomainsModal, CloudDomainsModal, InfrastructureMapModal } from './modals/amassModals.js';
@@ -12,10 +12,6 @@ import { ShuffleDNSResultsModal } from './modals/shuffleDNSModals.js';
 import ScreenshotResultsModal from './modals/ScreenshotResultsModal.js';
 import SettingsModal from './modals/SettingsModal.js';
 import ToolsModal from './modals/ToolsModal.js';
-import ExportModal from './modals/ExportModal.js';
-import ImportModal from './modals/ImportModal.js';
-import WelcomeModal from './modals/WelcomeModal.js';
-import GoogleDorkingModal from './modals/GoogleDorkingModal.js';
 import Ars0nFrameworkHeader from './components/ars0nFrameworkHeader.js';
 import ManageScopeTargets from './components/manageScopeTargets.js';
 import fetchAmassScans from './utils/fetchAmassScans.js';
@@ -90,10 +86,7 @@ import initiateNucleiScreenshotScan from './utils/initiateNucleiScreenshotScan';
 import monitorNucleiScreenshotScanStatus from './utils/monitorNucleiScreenshotScanStatus';
 import initiateMetaDataScan, { initiateCompanyMetaDataScan } from './utils/initiateMetaDataScan';
 import monitorMetaDataScanStatus, { monitorCompanyMetaDataScanStatus } from './utils/monitorMetaDataScanStatus';
-import MetaDataModal from './modals/MetaDataModal.js';
 import fetchHttpxScans from './utils/fetchHttpxScans';
-import ROIReport from './components/ROIReport';
-import HelpMeLearn from './components/HelpMeLearn';
 import {
   AUTO_SCAN_STEPS,
   resumeAutoScan as resumeAutoScanUtil,
@@ -165,6 +158,45 @@ import monitorCloudEnumScanStatus from './utils/monitorCloudEnumScanStatus';
 
 // Add Attack Surface Visualization import
 import AttackSurfaceVisualizationModal from './modals/AttackSurfaceVisualizationModal.js';
+
+// Add URL workflow imports
+import initiateKatanaURLScan from './utils/initiateKatanaURLScan';
+import monitorKatanaURLScanStatus from './utils/monitorKatanaURLScanStatus';
+import initiateLinkFinderURLScan from './utils/initiateLinkFinderURLScan';
+import monitorLinkFinderURLScanStatus from './utils/monitorLinkFinderURLScanStatus';
+import initiateWaybackURLsScan from './utils/initiateWaybackURLsScan';
+import monitorWaybackURLsScanStatus from './utils/monitorWaybackURLsScanStatus';
+import initiateGAUURLScan from './utils/initiateGAUURLScan';
+import monitorGAUURLScanStatus from './utils/monitorGAUURLScanStatus';
+import initiateFFUFURLScan from './utils/initiateFFUFURLScan';
+import monitorFFUFURLScanStatus from './utils/monitorFFUFURLScanStatus';
+import { KatanaURLResultsModal } from './modals/KatanaURLResultsModal';
+import { LinkFinderURLResultsModal } from './modals/LinkFinderURLResultsModal';
+import { WaybackURLsResultsModal } from './modals/WaybackURLsResultsModal';
+import { GAUURLResultsModal } from './modals/GAUURLResultsModal';
+import { FFUFURLResultsModal } from './modals/FFUFURLResultsModal';
+import { ApplicationQuestionsModal } from './modals/ApplicationQuestionsModal';
+import { MechanismsModal } from './modals/MechanismsModal';
+import { NotableObjectsModal } from './modals/NotableObjectsModal';
+import { SecurityControlsModal } from './modals/SecurityControlsModal';
+import { ThreatModelModal } from './modals/ThreatModelModal';
+import { FFUFConfigModal } from './modals/FFUFConfigModal';
+
+const ExportModal = lazy(() => import('./modals/ExportModal.js'));
+const ImportModal = lazy(() => import('./modals/ImportModal.js'));
+const WelcomeModal = lazy(() => import('./modals/WelcomeModal.js'));
+const ConfigUploadModal = lazy(() => import('./modals/ConfigUploadModal.js'));
+const APIIntegrationModal = lazy(() => import('./modals/APIIntegrationModal.js'));
+const GoogleDorkingModal = lazy(() => import('./modals/GoogleDorkingModal.js'));
+const MetaDataModal = lazy(() => import('./modals/MetaDataModal.js'));
+const ROIReport = lazy(() => import('./components/ROIReport'));
+const HelpMeLearnLazy = lazy(() => import('./components/HelpMeLearn'));
+
+const HelpMeLearn = ({ section }) => (
+  <Suspense fallback={<div style={{ height: '24px' }} />}>
+    <HelpMeLearnLazy section={section} />
+  </Suspense>
+);
 
 // Add helper function
 const getHttpxResultsCount = (scan) => {
@@ -280,37 +312,45 @@ const calculateROIScore = (targetURL) => {
   
   if (targetURL.status_code === 200 && katanaCount > 10) {
     try {
-      const headers = typeof targetURL.http_response_headers === 'string' 
-        ? JSON.parse(targetURL.http_response_headers)
-        : targetURL.http_response_headers;
+      let headers = null;
+      if (typeof targetURL.http_response_headers === 'string' && targetURL.http_response_headers.trim()) {
+        headers = JSON.parse(targetURL.http_response_headers);
+      } else if (typeof targetURL.http_response_headers === 'object') {
+        headers = targetURL.http_response_headers;
+      }
       
-      const hasCSP = Object.keys(headers || {}).some(header => 
-        header.toLowerCase() === 'content-security-policy'
-      );
-      
-      if (!hasCSP) {
-        score += 10;
+      if (headers) {
+        const hasCSP = Object.keys(headers).some(header => 
+          header.toLowerCase() === 'content-security-policy'
+        );
+        
+        if (!hasCSP) {
+          score += 10;
+        }
       }
     } catch (error) {
-      console.error('Error checking CSP header:', error);
     }
   }
   
   try {
-    const headers = typeof targetURL.http_response_headers === 'string'
-      ? JSON.parse(targetURL.http_response_headers)
-      : targetURL.http_response_headers;
+    let headers = null;
+    if (typeof targetURL.http_response_headers === 'string' && targetURL.http_response_headers.trim()) {
+      headers = JSON.parse(targetURL.http_response_headers);
+    } else if (typeof targetURL.http_response_headers === 'object') {
+      headers = targetURL.http_response_headers;
+    }
     
-    const hasCachingHeaders = Object.keys(headers || {}).some(header => {
-      const headerLower = header.toLowerCase();
-      return ['cache-control', 'etag', 'expires', 'vary'].includes(headerLower);
-    });
-    
-    if (hasCachingHeaders) {
-      score += 10;
+    if (headers) {
+      const hasCachingHeaders = Object.keys(headers).some(header => {
+        const headerLower = header.toLowerCase();
+        return ['cache-control', 'etag', 'expires', 'vary'].includes(headerLower);
+      });
+      
+      if (hasCachingHeaders) {
+        score += 10;
+      }
     }
   } catch (error) {
-    console.error('Error checking caching headers:', error);
   }
   
   return Math.max(0, Math.round(score));
@@ -328,6 +368,8 @@ function App() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showConfigUploadModal, setShowConfigUploadModal] = useState(false);
+  const [showAPIIntegrationModal, setShowAPIIntegrationModal] = useState(false);
   const [selections, setSelections] = useState({
     type: '',
     inputText: '',
@@ -586,6 +628,46 @@ function App() {
   const [showExploreAttackSurfaceModal, setShowExploreAttackSurfaceModal] = useState(false);
   const [showAttackSurfaceVisualizationModal, setShowAttackSurfaceVisualizationModal] = useState(false);
   const [katanaCompanyCloudAssets, setKatanaCompanyCloudAssets] = useState([]);
+  
+  const [katanaURLScans, setKatanaURLScans] = useState([]);
+  const [mostRecentKatanaURLScanStatus, setMostRecentKatanaURLScanStatus] = useState(null);
+  const [mostRecentKatanaURLScan, setMostRecentKatanaURLScan] = useState(null);
+  const [isKatanaURLScanning, setIsKatanaURLScanning] = useState(false);
+  
+  const [linkFinderURLScans, setLinkFinderURLScans] = useState([]);
+  const [mostRecentLinkFinderURLScanStatus, setMostRecentLinkFinderURLScanStatus] = useState(null);
+  const [mostRecentLinkFinderURLScan, setMostRecentLinkFinderURLScan] = useState(null);
+  const [isLinkFinderURLScanning, setIsLinkFinderURLScanning] = useState(false);
+  
+  const [waybackURLsScans, setWaybackURLsScans] = useState([]);
+  const [mostRecentWaybackURLsScanStatus, setMostRecentWaybackURLsScanStatus] = useState(null);
+  const [mostRecentWaybackURLsScan, setMostRecentWaybackURLsScan] = useState(null);
+  const [isWaybackURLsScanning, setIsWaybackURLsScanning] = useState(false);
+  
+  const [gauURLScans, setGAUURLScans] = useState([]);
+  const [mostRecentGAUURLScanStatus, setMostRecentGAUURLScanStatus] = useState(null);
+  const [mostRecentGAUURLScan, setMostRecentGAUURLScan] = useState(null);
+  const [isGAUURLScanning, setIsGAUURLScanning] = useState(false);
+  
+  const [ffufURLScans, setFFUFURLScans] = useState([]);
+  const [mostRecentFFUFURLScanStatus, setMostRecentFFUFURLScanStatus] = useState(null);
+  const [mostRecentFFUFURLScan, setMostRecentFFUFURLScan] = useState(null);
+  const [isFFUFURLScanning, setIsFFUFURLScanning] = useState(false);
+  
+  const [showKatanaURLResultsModal, setShowKatanaURLResultsModal] = useState(false);
+  const [showLinkFinderURLResultsModal, setShowLinkFinderURLResultsModal] = useState(false);
+  const [showWaybackURLsResultsModal, setShowWaybackURLsResultsModal] = useState(false);
+  const [showGAUURLResultsModal, setShowGAUURLResultsModal] = useState(false);
+  const [showFFUFURLResultsModal, setShowFFUFURLResultsModal] = useState(false);
+  const [showApplicationQuestionsModal, setShowApplicationQuestionsModal] = useState(false);
+  const [showMechanismsModal, setShowMechanismsModal] = useState(false);
+  const [showNotableObjectsModal, setShowNotableObjectsModal] = useState(false);
+  const [showSecurityControlsModal, setShowSecurityControlsModal] = useState(false);
+  const [showThreatModelModal, setShowThreatModelModal] = useState(false);
+  const [showFFUFConfigModal, setShowFFUFConfigModal] = useState(false);
+  const [mechanismsForThreatModel, setMechanismsForThreatModel] = useState([]);
+  const [notableObjectsForThreatModel, setNotableObjectsForThreatModel] = useState([]);
+  const [securityControlsForThreatModel, setSecurityControlsForThreatModel] = useState([]);
   
   const handleCloseSubdomainsModal = () => setShowSubdomainsModal(false);
   const handleCloseCloudDomainsModal = () => setShowCloudDomainsModal(false);
@@ -1606,11 +1688,12 @@ function App() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!activeTarget) return;
+  const handleDelete = async (targetId = null) => {
+    const idToDelete = targetId || activeTarget?.id;
+    if (!idToDelete) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/delete/${activeTarget.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/scopetarget/delete/${idToDelete}`, {
         method: 'DELETE',
       });
 
@@ -1619,13 +1702,17 @@ function App() {
       }
 
       setScopeTargets((prev) => {
-        const updatedTargets = prev.filter((target) => target.id !== activeTarget.id);
-        const newActiveTarget = updatedTargets.length > 0 ? updatedTargets[0] : null;
-        setActiveTarget(newActiveTarget);
-        if (!newActiveTarget && showActiveModal) {
-          setShowActiveModal(false);
-          setShowModal(true);
+        const updatedTargets = prev.filter((target) => target.id !== idToDelete);
+        
+        if (activeTarget?.id === idToDelete) {
+          const newActiveTarget = updatedTargets.length > 0 ? updatedTargets[0] : null;
+          setActiveTarget(newActiveTarget);
+          if (!newActiveTarget && showActiveModal) {
+            setShowActiveModal(false);
+            setShowModal(true);
+          }
         }
+        
         return updatedTargets;
       });
     } catch (error) {
@@ -2887,6 +2974,8 @@ function App() {
   }, [activeTarget]);
 
   const handleOpenMetaDataModal = async () => {
+    setShowMetaDataModal(true);
+    
     try {
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${activeTarget.id}/target-urls`
@@ -2897,15 +2986,15 @@ function App() {
       const data = await response.json();
       const safeData = data || [];
       setTargetURLs(safeData);
-      setShowMetaDataModal(true);
     } catch (error) {
       console.error('Error fetching target URLs:', error);
     }
   };
 
   const handleOpenROIReport = async () => {
+    setShowROIReport(true);
+    
     try {
-      // First, get the latest target URLs
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${activeTarget.id}/target-urls`
       );
@@ -2914,41 +3003,9 @@ function App() {
       }
       const data = await response.json();
       const safeData = data || [];
-
-      // Calculate and update ROI scores for each target
-      const updatePromises = safeData.map(async (target) => {
-        const score = calculateROIScore(target);
-        const updateResponse = await fetch(
-          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/target-urls/${target.id}/roi-score`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ roi_score: score }),
-          }
-        );
-        if (!updateResponse.ok) {
-          console.error(`Failed to update ROI score for target ${target.id}`);
-        }
-      });
-
-      // Wait for all updates to complete
-      await Promise.all(updatePromises);
-
-      // Fetch the updated target URLs
-      const updatedResponse = await fetch(
-        `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/api/scope-targets/${activeTarget.id}/target-urls`
-      );
-      if (!updatedResponse.ok) {
-        throw new Error('Failed to fetch updated target URLs');
-      }
-      const updatedData = await updatedResponse.json();
-      const safeUpdatedData = updatedData || [];
-      setTargetURLs(safeUpdatedData);
-      setShowROIReport(true);
+      setTargetURLs(safeData);
     } catch (error) {
-      console.error('Error preparing ROI report:', error);
+      console.error('Error loading ROI report:', error);
     }
   };
 
@@ -2980,6 +3037,14 @@ function App() {
     setShowWelcomeModal(false);
   };
 
+  const handleCloseConfigUploadModal = () => {
+    setShowConfigUploadModal(false);
+  };
+
+  const handleCloseAPIIntegrationModal = () => {
+    setShowAPIIntegrationModal(false);
+  };
+
   const handleWelcomeAddScopeTarget = () => {
     setShowWelcomeModal(false);
     setShowModal(true);
@@ -2990,13 +3055,33 @@ function App() {
     setShowImportModal(true);
   };
 
+  const handleWelcomeUploadConfig = () => {
+    setShowWelcomeModal(false);
+    setShowConfigUploadModal(true);
+  };
+
+  const handleWelcomeUseAPI = () => {
+    setShowWelcomeModal(false);
+    setShowAPIIntegrationModal(true);
+  };
+
   const handleImportSuccess = async (result) => {
+    await fetchScopeTargets();
+  };
+
+  const handleConfigUploadSuccess = async (result) => {
+    await fetchScopeTargets();
+  };
+
+  const handleAPIIntegrationSuccess = async (result) => {
     await fetchScopeTargets();
   };
 
   const handleBackToWelcome = () => {
     setShowModal(false);
     setShowImportModal(false);
+    setShowConfigUploadModal(false);
+    setShowAPIIntegrationModal(false);
     setShowWelcomeModal(true);
   };
 
@@ -3677,6 +3762,67 @@ function App() {
     }
   }, [activeTarget]);
 
+  // URL Workflow scans useEffect hooks
+  useEffect(() => {
+    if (activeTarget && activeTarget.type === 'URL') {
+      monitorKatanaURLScanStatus(
+        activeTarget,
+        setKatanaURLScans,
+        setMostRecentKatanaURLScan,
+        setIsKatanaURLScanning,
+        setMostRecentKatanaURLScanStatus
+      );
+    }
+  }, [activeTarget]);
+
+  useEffect(() => {
+    if (activeTarget && activeTarget.type === 'URL') {
+      monitorLinkFinderURLScanStatus(
+        activeTarget,
+        setLinkFinderURLScans,
+        setMostRecentLinkFinderURLScan,
+        setIsLinkFinderURLScanning,
+        setMostRecentLinkFinderURLScanStatus
+      );
+    }
+  }, [activeTarget]);
+
+  useEffect(() => {
+    if (activeTarget && activeTarget.type === 'URL') {
+      monitorWaybackURLsScanStatus(
+        activeTarget,
+        setWaybackURLsScans,
+        setMostRecentWaybackURLsScan,
+        setIsWaybackURLsScanning,
+        setMostRecentWaybackURLsScanStatus
+      );
+    }
+  }, [activeTarget]);
+
+  useEffect(() => {
+    if (activeTarget && activeTarget.type === 'URL') {
+      monitorGAUURLScanStatus(
+        activeTarget,
+        setGAUURLScans,
+        setMostRecentGAUURLScan,
+        setIsGAUURLScanning,
+        setMostRecentGAUURLScanStatus
+      );
+    }
+  }, [activeTarget]);
+
+  useEffect(() => {
+    if (activeTarget && activeTarget.type === 'URL') {
+      monitorFFUFURLScanStatus(
+        activeTarget,
+        setFFUFURLScans,
+        setMostRecentFFUFURLScan,
+        setIsFFUFURLScanning,
+        setMostRecentFFUFURLScanStatus
+      );
+    }
+  }, [activeTarget]);
+
   // Katana Company scans useEffect
   useEffect(() => {
     if (activeTarget) {
@@ -3776,6 +3922,121 @@ function App() {
       setMostRecentGitHubReconScan
     );
   };
+
+  const startKatanaURLScan = () => {
+    initiateKatanaURLScan(
+      activeTarget,
+      setIsKatanaURLScanning,
+      setKatanaURLScans,
+      setMostRecentKatanaURLScan,
+      setMostRecentKatanaURLScanStatus
+    );
+  };
+
+  const startLinkFinderURLScan = () => {
+    initiateLinkFinderURLScan(
+      activeTarget,
+      setIsLinkFinderURLScanning,
+      setLinkFinderURLScans,
+      setMostRecentLinkFinderURLScan,
+      setMostRecentLinkFinderURLScanStatus
+    );
+  };
+
+  const startWaybackURLsScan = () => {
+    initiateWaybackURLsScan(
+      activeTarget,
+      setIsWaybackURLsScanning,
+      setWaybackURLsScans,
+      setMostRecentWaybackURLsScan,
+      setMostRecentWaybackURLsScanStatus
+    );
+  };
+
+  const startGAUURLScan = () => {
+    initiateGAUURLScan(
+      activeTarget,
+      setIsGAUURLScanning,
+      setGAUURLScans,
+      setMostRecentGAUURLScan,
+      setMostRecentGAUURLScanStatus
+    );
+  };
+
+  const startFFUFURLScan = () => {
+    initiateFFUFURLScan(
+      activeTarget,
+      setIsFFUFURLScanning,
+      setFFUFURLScans,
+      setMostRecentFFUFURLScan,
+      setMostRecentFFUFURLScanStatus
+    );
+  };
+
+  const handleOpenKatanaURLResultsModal = () => setShowKatanaURLResultsModal(true);
+  const handleCloseKatanaURLResultsModal = () => setShowKatanaURLResultsModal(false);
+  const handleOpenLinkFinderURLResultsModal = () => setShowLinkFinderURLResultsModal(true);
+  const handleCloseLinkFinderURLResultsModal = () => setShowLinkFinderURLResultsModal(false);
+  const handleOpenWaybackURLsResultsModal = () => setShowWaybackURLsResultsModal(true);
+  const handleCloseWaybackURLsResultsModal = () => setShowWaybackURLsResultsModal(false);
+  const handleOpenGAUURLResultsModal = () => setShowGAUURLResultsModal(true);
+  const handleCloseGAUURLResultsModal = () => setShowGAUURLResultsModal(false);
+  const handleOpenFFUFURLResultsModal = () => setShowFFUFURLResultsModal(true);
+  const handleCloseFFUFURLResultsModal = () => setShowFFUFURLResultsModal(false);
+  const handleOpenApplicationQuestionsModal = () => setShowApplicationQuestionsModal(true);
+  const handleCloseApplicationQuestionsModal = () => setShowApplicationQuestionsModal(false);
+  const handleOpenMechanismsModal = () => setShowMechanismsModal(true);
+  const handleCloseMechanismsModal = () => setShowMechanismsModal(false);
+  const handleOpenNotableObjectsModal = () => setShowNotableObjectsModal(true);
+  const handleCloseNotableObjectsModal = () => setShowNotableObjectsModal(false);
+  const handleOpenSecurityControlsModal = () => setShowSecurityControlsModal(true);
+  const handleCloseSecurityControlsModal = () => setShowSecurityControlsModal(false);
+  const handleOpenThreatModelModal = async () => {
+    setShowThreatModelModal(true);
+    if (activeTarget) {
+      try {
+        const mechanismsResponse = await fetch(
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/mechanisms/${activeTarget.id}/examples`
+        );
+        if (mechanismsResponse.ok) {
+          const mechanismsData = await mechanismsResponse.json();
+          const uniqueMechanisms = [...new Set(mechanismsData.map(m => m.mechanism))];
+          setMechanismsForThreatModel(uniqueMechanisms);
+        }
+      } catch (error) {
+        console.error('Error fetching mechanisms:', error);
+      }
+      
+      try {
+        const objectsResponse = await fetch(
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/notable-objects/${activeTarget.id}`
+        );
+        if (objectsResponse.ok) {
+          const objectsData = await objectsResponse.json();
+          const objectNames = objectsData.map(o => o.object_name);
+          setNotableObjectsForThreatModel(objectNames);
+        }
+      } catch (error) {
+        console.error('Error fetching notable objects:', error);
+      }
+
+      try {
+        const controlsResponse = await fetch(
+          `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_IP}:${process.env.REACT_APP_SERVER_PORT}/security-controls/${activeTarget.id}/notes`
+        );
+        if (controlsResponse.ok) {
+          const controlsData = await controlsResponse.json();
+          const uniqueControls = [...new Set(controlsData.map(c => c.control_name))];
+          setSecurityControlsForThreatModel(uniqueControls);
+        }
+      } catch (error) {
+        console.error('Error fetching security controls:', error);
+      }
+    }
+  };
+  const handleCloseThreatModelModal = () => setShowThreatModelModal(false);
+  const handleOpenFFUFConfigModal = () => setShowFFUFConfigModal(true);
+  const handleCloseFFUFConfigModal = () => setShowFFUFConfigModal(false);
 
   useEffect(() => {
     if (activeTarget) {
@@ -4422,7 +4683,7 @@ function App() {
         handleSelect={handleSelect}
         handleFormSubmit={handleSubmit}
         errorMessage={errorMessage}
-        showBackButton={scopeTargets.length === 0}
+        showBackButton={true}
         onBackClick={handleBackToWelcome}
       />
 
@@ -4447,25 +4708,53 @@ function App() {
         handleClose={handleCloseToolsModal}
       />
 
-      <ExportModal
-        show={showExportModal}
-        handleClose={handleCloseExportModal}
-      />
+      <Suspense fallback={<div />}>
+        <ExportModal
+          show={showExportModal}
+          handleClose={handleCloseExportModal}
+        />
+      </Suspense>
 
-      <ImportModal
-        show={showImportModal}
-        handleClose={handleCloseImportModal}
-        onSuccess={handleImportSuccess}
-        showBackButton={scopeTargets.length === 0}
-        onBackClick={handleBackToWelcome}
-      />
+      <Suspense fallback={<div />}>
+        <ImportModal
+          show={showImportModal}
+          handleClose={handleCloseImportModal}
+          onSuccess={handleImportSuccess}
+          showBackButton={scopeTargets.length === 0}
+          onBackClick={handleBackToWelcome}
+        />
+      </Suspense>
 
-      <WelcomeModal
-        show={showWelcomeModal}
-        handleClose={handleCloseWelcomeModal}
-        onAddScopeTarget={handleWelcomeAddScopeTarget}
-        onImportData={handleWelcomeImportData}
-      />
+      <Suspense fallback={<div />}>
+        <WelcomeModal
+          show={showWelcomeModal}
+          handleClose={handleCloseWelcomeModal}
+          onAddScopeTarget={handleWelcomeAddScopeTarget}
+          onImportData={handleWelcomeImportData}
+          onUploadConfig={handleWelcomeUploadConfig}
+          onUseAPI={handleWelcomeUseAPI}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div />}>
+        <ConfigUploadModal
+          show={showConfigUploadModal}
+          handleClose={handleCloseConfigUploadModal}
+          onSuccess={handleConfigUploadSuccess}
+          showBackButton={scopeTargets.length === 0}
+          onBackClick={handleBackToWelcome}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div />}>
+        <APIIntegrationModal
+          show={showAPIIntegrationModal}
+          handleClose={handleCloseAPIIntegrationModal}
+          onSuccess={handleAPIIntegrationSuccess}
+          showBackButton={scopeTargets.length === 0}
+          onBackClick={handleBackToWelcome}
+        />
+      </Suspense>
 
       <Modal data-bs-theme="dark" show={showScanHistoryModal} onHide={handleCloseScanHistoryModal} size="xl">
         <Modal.Header closeButton>
@@ -6271,21 +6560,271 @@ function App() {
             )}
             {activeTarget.type === 'URL' && (
               <div className="mb-4">
-                <h3 className="text-danger">URL</h3>
-                <Row>
+                <h3 className="text-danger mb-3">URL</h3>
+                <h4 className="text-secondary mb-3 fs-5">Threat Modeling</h4>
+                <HelpMeLearn section="threatModeling" />
+                <Row className="mb-4">
                   <Col md={12}>
-                    <Card className="mb-3 shadow-sm">
-                      <Card.Body className="text-center">
-                        <Card.Title className="text-danger mb-4">Coming Soon!</Card.Title>
-                        <Card.Text>
-                          The URL workflow is currently under development. rs0n is working hard to create powerful features for analyzing individual target URLs.
+                    <Card className="shadow-sm h-100 text-center" style={{ minHeight: '200px' }}>
+                      <Card.Body className="d-flex flex-column">
+                        <Card.Title className="text-danger mb-3">
+                          STRIDE Threat Model
+                        </Card.Title>
+                        <Card.Text className="text-white small fst-italic">
+                          Perform comprehensive threat modeling using the STRIDE methodology to identify security threats across six categories:
+                          <div style={{ columnCount: 2, columnGap: '20px', marginTop: '15px', marginBottom: '15px', textAlign: 'center' }}>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>(S)poofing</strong> - Impersonation of users, systems, or data
+                            </div>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>(T)ampering</strong> - Malicious modification of data or code
+                            </div>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>(R)epudiation</strong> - Denial of actions without proper logging
+                            </div>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>(I)nformation Disclosure</strong> - Exposure of sensitive information
+                            </div>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>(D)enial of Service</strong> - Preventing legitimate access
+                            </div>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>(E)levation of Privilege</strong> - Gaining unauthorized elevated permissions
+                            </div>
+                          </div>
+                          Build your threat model by documenting reconnaissance findings, identifying mechanisms and objects, assessing security controls, and systematically analyzing potential attack vectors and their business impact.
                         </Card.Text>
-                        <Card.Text className="text-muted fst-italic mt-4">
-                          Please note that rs0n maintains this tool while balancing a full-time job and family life. This is a passion project provided free to the community, and your patience and kindness are greatly appreciated! 💝
+                        <div className="mt-auto">
+                          <Row className="g-2">
+                            <Col>
+                              <Button
+                                variant="outline-danger"
+                                className="w-100"
+                                onClick={handleOpenApplicationQuestionsModal}
+                              >
+                                High-Level Questions
+                              </Button>
+                            </Col>
+                            <Col>
+                              <Button
+                                variant="outline-danger"
+                                className="w-100"
+                                onClick={handleOpenMechanismsModal}
+                              >
+                                Mechanisms
+                              </Button>
+                            </Col>
+                            <Col>
+                              <Button
+                                variant="outline-danger"
+                                className="w-100"
+                                onClick={handleOpenNotableObjectsModal}
+                              >
+                                Notable Objects
+                              </Button>
+                            </Col>
+                            <Col>
+                              <Button
+                                variant="outline-danger"
+                                className="w-100"
+                                onClick={handleOpenSecurityControlsModal}
+                              >
+                                Security Controls
+                              </Button>
+                            </Col>
+                            <Col>
+                              <Button
+                                variant="outline-danger"
+                                className="w-100"
+                                onClick={handleOpenThreatModelModal}
+                              >
+                                Threat Model
+                              </Button>
+                            </Col>
+                          </Row>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+                <h4 className="text-secondary mb-3 fs-5 mt-4">URL Discovery & Endpoint Enumeration</h4>
+                <div className="alert alert-warning mb-3" role="alert">
+                  <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                  This section is still under development
+                </div>
+                <Row className="mb-4">
+                  {[
+                    {
+                      name: 'Katana',
+                      link: 'https://github.com/projectdiscovery/katana',
+                      description: 'A next-generation crawling and spidering framework for discovering URLs and endpoints.',
+                      isActive: true,
+                      status: mostRecentKatanaURLScanStatus,
+                      isScanning: isKatanaURLScanning,
+                      onScan: startKatanaURLScan,
+                      onResults: handleOpenKatanaURLResultsModal,
+                      resultCount: mostRecentKatanaURLScan && mostRecentKatanaURLScan.result ? 
+                        mostRecentKatanaURLScan.result.split('\n').filter(line => line.trim()).length : 0,
+                      resultLabel: 'Endpoints'
+                    },
+                    {
+                      name: 'LinkFinder',
+                      link: 'https://github.com/GerbenJavado/LinkFinder',
+                      description: 'Discover endpoints and their parameters in JavaScript files.',
+                      isActive: true,
+                      status: mostRecentLinkFinderURLScanStatus,
+                      isScanning: isLinkFinderURLScanning,
+                      onScan: startLinkFinderURLScan,
+                      onResults: handleOpenLinkFinderURLResultsModal,
+                      resultCount: mostRecentLinkFinderURLScan && mostRecentLinkFinderURLScan.result ? 
+                        mostRecentLinkFinderURLScan.result.split('\n').filter(line => line.trim()).length : 0,
+                      resultLabel: 'Endpoints'
+                    },
+                    {
+                      name: 'Waybackurls',
+                      link: 'https://github.com/tomnomnom/waybackurls',
+                      description: 'Fetch all the URLs that the Wayback Machine knows about for a domain.',
+                      isActive: true,
+                      status: mostRecentWaybackURLsScanStatus,
+                      isScanning: isWaybackURLsScanning,
+                      onScan: startWaybackURLsScan,
+                      onResults: handleOpenWaybackURLsResultsModal,
+                      resultCount: mostRecentWaybackURLsScan && mostRecentWaybackURLsScan.result ? 
+                        mostRecentWaybackURLsScan.result.split('\n').filter(line => line.trim()).length : 0,
+                      resultLabel: 'Endpoints'
+                    },
+                    {
+                      name: 'GAU',
+                      link: 'https://github.com/lc/gau',
+                      description: 'Get All URLs - Fetch known URLs from AlienVault\'s OTX, Wayback Machine, and Common Crawl.',
+                      isActive: true,
+                      status: mostRecentGAUURLScanStatus,
+                      isScanning: isGAUURLScanning,
+                      onScan: startGAUURLScan,
+                      onResults: handleOpenGAUURLResultsModal,
+                      resultCount: mostRecentGAUURLScan && mostRecentGAUURLScan.result ? 
+                        (() => {
+                          try {
+                            const results = mostRecentGAUURLScan.result.split('\n')
+                              .filter(line => line.trim())
+                              .map(line => JSON.parse(line));
+                            return results.length;
+                          } catch (e) {
+                            return mostRecentGAUURLScan.result.split('\n').filter(line => line.trim()).length;
+                          }
+                        })() : 0,
+                      resultLabel: 'Endpoints'
+                    }
+                  ].map((tool, index) => (
+                    <Col md={3} key={index}>
+                      <Card className="shadow-sm h-100 text-center" style={{ minHeight: '250px' }}>
+                        <Card.Body className="d-flex flex-column">
+                          <Card.Title className="text-danger mb-3">
+                            <a href={tool.link} className="text-danger text-decoration-none" target="_blank" rel="noopener noreferrer">
+                              {tool.name}
+                            </a>
+                          </Card.Title>
+                          <Card.Text className="text-white small fst-italic">
+                            {tool.description}
+                          </Card.Text>
+                          <div className="mt-auto">
+                            <Card.Text className="text-white small mb-3">
+                              {tool.resultLabel}: {tool.resultCount || "0"}
+                            </Card.Text>
+                            <div className="d-flex justify-content-center gap-2">
+                              <Button
+                                variant="outline-danger"
+                                className="flex-fill"
+                                onClick={tool.onScan}
+                                disabled={!tool.isActive || tool.isScanning}
+                              >
+                                <div className="btn-content">
+                                  {tool.isScanning ? (
+                                    <Spinner animation="border" size="sm" />
+                                  ) : (
+                                    'Scan'
+                                  )}
+                                </div>
+                              </Button>
+                              <Button
+                                variant="outline-danger"
+                                className="flex-fill"
+                                onClick={tool.onResults}
+                                disabled={!tool.status || tool.status !== 'success'}
+                              >
+                                Results
+                              </Button>
+                            </div>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+
+                <h4 className="text-secondary mb-3 fs-5 mt-4">Endpoint Brute Forcing</h4>
+                <div className="alert alert-warning mb-3" role="alert">
+                  <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                  This section is still under development
+                </div>
+                <Row className="mb-4">
+                  <Col md={12}>
+                    <Card className="shadow-sm h-100 text-center" style={{ minHeight: '250px' }}>
+                      <Card.Body className="d-flex flex-column">
+                        <Card.Title className="text-danger mb-3">
+                          <a href="https://github.com/ffuf/ffuf" className="text-danger text-decoration-none" target="_blank" rel="noopener noreferrer">
+                            FFUF
+                          </a>
+                        </Card.Title>
+                        <Card.Text className="text-white small fst-italic">
+                          Fast web fuzzer written in Go. Brute force endpoints, parameters, directories, and more with custom wordlists and extensive filtering options.
                         </Card.Text>
-                        <Card.Text className="text-danger mt-4">
-                          In the meantime, try out our fully-featured Wildcard workflow - it's packed with powerful reconnaissance capabilities!
-                        </Card.Text>
+                        <div className="mt-auto">
+                          <Card.Text className="text-white small mb-3">
+                            Endpoints: {mostRecentFFUFURLScan?.result ? (() => {
+                              try {
+                                const parsed = typeof mostRecentFFUFURLScan.result === 'string' 
+                                  ? JSON.parse(mostRecentFFUFURLScan.result) 
+                                  : mostRecentFFUFURLScan.result;
+                                return parsed.endpoints?.length || 0;
+                              } catch (e) {
+                                return 0;
+                              }
+                            })() : 0}
+                          </Card.Text>
+                          <div className="d-flex justify-content-center gap-2">
+                            <Button
+                              variant="outline-danger"
+                              className="flex-fill"
+                              onClick={handleOpenFFUFConfigModal}
+                            >
+                              <i className="bi bi-gear me-2" />
+                              Configure
+                            </Button>
+                            <Button
+                              variant="outline-danger"
+                              className="flex-fill"
+                              onClick={startFFUFURLScan}
+                              disabled={!activeTarget || isFFUFURLScanning}
+                            >
+                              <div className="btn-content">
+                                {isFFUFURLScanning ? (
+                                  <Spinner animation="border" size="sm" />
+                                ) : (
+                                  'Scan'
+                                )}
+                              </div>
+                            </Button>
+                            <Button
+                              variant="outline-danger"
+                              className="flex-fill"
+                              onClick={handleOpenFFUFURLResultsModal}
+                              disabled={!mostRecentFFUFURLScan || mostRecentFFUFURLScanStatus !== 'success'}
+                            >
+                              Results
+                            </Button>
+                          </div>
+                        </div>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -6295,18 +6834,25 @@ function App() {
           </div>
         </Fade>
       )}
-      <MetaDataModal
-        showMetaDataModal={showMetaDataModal}
-        handleCloseMetaDataModal={handleCloseMetaDataModal}
-        metaDataResults={mostRecentMetaDataScan}
-        targetURLs={targetURLs}
-        setTargetURLs={setTargetURLs}
-      />
-      <ROIReport
-        show={showROIReport}
-        onHide={handleCloseROIReport}
-        targetURLs={targetURLs}
-      />
+      <Suspense fallback={<div />}>
+        <MetaDataModal
+          showMetaDataModal={showMetaDataModal}
+          handleCloseMetaDataModal={handleCloseMetaDataModal}
+          metaDataResults={mostRecentMetaDataScan}
+          targetURLs={targetURLs}
+          setTargetURLs={setTargetURLs}
+          fetchScopeTargets={fetchScopeTargets}
+        />
+      </Suspense>
+      <Suspense fallback={<div />}>
+        <ROIReport
+          show={showROIReport}
+          onHide={handleCloseROIReport}
+          targetURLs={targetURLs}
+          setTargetURLs={setTargetURLs}
+          fetchScopeTargets={fetchScopeTargets}
+        />
+      </Suspense>
       <Modal data-bs-theme="dark" show={showAutoScanHistoryModal} onHide={handleCloseAutoScanHistoryModal} size="xl" dialogClassName="modal-90w">
         <Modal.Header closeButton>
           <Modal.Title className='text-danger'>Auto Scan History</Modal.Title>
@@ -6528,14 +7074,16 @@ function App() {
         </Modal.Body>
       </Modal>
 
-      <GoogleDorkingModal
-        show={showGoogleDorkingManualModal}
-        handleClose={handleCloseGoogleDorkingManualModal}
+      <Suspense fallback={<div />}>
+        <GoogleDorkingModal
+          show={showGoogleDorkingManualModal}
+          handleClose={handleCloseGoogleDorkingManualModal}
         companyName={activeTarget?.scope_target || ''}
         onDomainAdd={handleGoogleDorkingDomainAdd}
         error={googleDorkingError}
         onClearError={() => setGoogleDorkingError('')}
-      />
+        />
+      </Suspense>
 
       <ReverseWhoisModal
         show={showReverseWhoisManualModal}
@@ -6695,6 +7243,80 @@ function App() {
         show={showKatanaCompanyHistoryModal}
         handleClose={handleCloseKatanaCompanyHistoryModal}
         scans={katanaCompanyScans}
+      />
+
+      <KatanaURLResultsModal
+        show={showKatanaURLResultsModal}
+        handleClose={handleCloseKatanaURLResultsModal}
+        activeTarget={activeTarget}
+        mostRecentKatanaURLScan={mostRecentKatanaURLScan}
+      />
+
+      <LinkFinderURLResultsModal
+        show={showLinkFinderURLResultsModal}
+        handleClose={handleCloseLinkFinderURLResultsModal}
+        activeTarget={activeTarget}
+        mostRecentLinkFinderURLScan={mostRecentLinkFinderURLScan}
+      />
+
+      <WaybackURLsResultsModal
+        show={showWaybackURLsResultsModal}
+        handleClose={handleCloseWaybackURLsResultsModal}
+        activeTarget={activeTarget}
+        mostRecentWaybackURLsScan={mostRecentWaybackURLsScan}
+      />
+
+      <GAUURLResultsModal
+        show={showGAUURLResultsModal}
+        handleClose={handleCloseGAUURLResultsModal}
+        activeTarget={activeTarget}
+        mostRecentGAUURLScan={mostRecentGAUURLScan}
+      />
+
+      <FFUFURLResultsModal
+        show={showFFUFURLResultsModal}
+        handleClose={handleCloseFFUFURLResultsModal}
+        activeTarget={activeTarget}
+        mostRecentFFUFURLScan={mostRecentFFUFURLScan}
+      />
+
+      <ApplicationQuestionsModal
+        show={showApplicationQuestionsModal}
+        handleClose={handleCloseApplicationQuestionsModal}
+        activeTarget={activeTarget}
+      />
+
+      <MechanismsModal
+        show={showMechanismsModal}
+        handleClose={handleCloseMechanismsModal}
+        activeTarget={activeTarget}
+      />
+
+      <NotableObjectsModal
+        show={showNotableObjectsModal}
+        handleClose={handleCloseNotableObjectsModal}
+        activeTarget={activeTarget}
+      />
+
+      <SecurityControlsModal
+        show={showSecurityControlsModal}
+        handleClose={handleCloseSecurityControlsModal}
+        activeTarget={activeTarget}
+      />
+
+      <ThreatModelModal
+        show={showThreatModelModal}
+        handleClose={handleCloseThreatModelModal}
+        activeTarget={activeTarget}
+        mechanisms={mechanismsForThreatModel}
+        notableObjects={notableObjectsForThreatModel}
+        securityControls={securityControlsForThreatModel}
+      />
+
+      <FFUFConfigModal
+        show={showFFUFConfigModal}
+        handleClose={handleCloseFFUFConfigModal}
+        activeTarget={activeTarget}
       />
 
       <ExploreAttackSurfaceModal
